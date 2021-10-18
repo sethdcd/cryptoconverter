@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import InputForm from './InputForm';
 import Dropdown from './Dropdown';
 import axios from 'axios';
@@ -26,11 +26,20 @@ const ConvertCrypto = () => {
     const [selection, setSelection] = useState(options[0]);
     const [inputData, setInputData] = useState(0);
     const [total, setTotal] = useState(0);
+    const [debouncedAmount, setDebouncedAmount] = useState(inputData);
        
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            setDebouncedAmount(inputData);
+        }, 500);
 
-    const onFormSubmit = (e) => {
-        e.preventDefault();
+        return () => {
+            clearTimeout(timeoutId);
+        }
 
+    }, [inputData]);
+
+    useEffect(() => {
         const convertAPI = async () => {
             const {data} = await axios.get('http://api.coinlayer.com/live', {
                 params: {
@@ -38,32 +47,36 @@ const ConvertCrypto = () => {
                     symbols: selection.id
                 }
             });
-
-            setTotal(inputData / data.rates[selection.id]);
-            
+    
+            setTotal(debouncedAmount / data.rates[selection.id]);
         }
-        convertAPI();        
-    }
+        return convertAPI();    
+    }, [debouncedAmount, selection]);
 
+ 
+ 
     return (
-        <div className="ui segment">
-            <form className="ui form" onSubmit={onFormSubmit}>
-                <InputForm
-                    label="Enter a value"
-                    inputType="number"
-                    inputData={inputData}
-                    updateData={setInputData}
-                />
-                <Dropdown 
-                    label="Select Crypto Coin"
-                    options={options}
-                    selection={selection}    
-                    updateSelection={setSelection}
-                />
-                <br />
-                <button className="ui button" type="submit">Convert</button>   
-                <h4>{`$${inputData} ${inputData == 1  ? 'dollar' : 'dollars'} is worth ${total.toFixed(8)} ${selection.value}`}</h4>
-            </form>
+        <div className="ui centered grid">
+            <div className="six wide column">
+                <div className="ui segment">
+                    <form className="ui form">
+                        <InputForm
+                            label="Enter an Amount"
+                            inputType="number"
+                            inputData={inputData}
+                            updateData={setInputData}
+                        />
+                        <Dropdown 
+                            label="Select Crypto Coin"
+                            options={options}
+                            selection={selection}    
+                            updateSelection={setSelection}
+                        />
+                         
+                        <h4>{`$${debouncedAmount} ${debouncedAmount === '1'  ? 'dollar' : 'dollars'} is worth ${total.toFixed(8)} ${selection.value}`}</h4>
+                    </form>
+                </div>
+            </div>
         </div>
     );
 };

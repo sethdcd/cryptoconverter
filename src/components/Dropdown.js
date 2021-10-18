@@ -19,11 +19,13 @@ const Dropdown = ({label, options, selection, updateSelection}) => {
         return () => {
             document.body.removeEventListener('click', onBodyClick, {capture: true});
         }
-    });
+        // added in []
+    },[]);
 
     const renderedOptions = options.map((option) => {
         if (selection.id === option.id) {
-            return;
+            // added in null
+            return null;
         };
 
         return (
