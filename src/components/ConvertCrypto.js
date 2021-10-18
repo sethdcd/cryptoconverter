@@ -3,7 +3,26 @@ import InputForm from './InputForm';
 import Dropdown from './Dropdown';
 import axios from 'axios';
 
-const options = [
+const currency = [
+    {
+        id: 'USD',
+        value: 'US Dollar'
+    },
+    {
+        id: 'EUR',
+        value: 'Euro'
+    },
+    {
+        id: 'JPY',
+        value: 'Yen'
+    },
+    {
+        id: 'GBP',
+        value: 'British Pound'
+    },
+];
+
+const crypto = [
     {
         id: 'BTC',
         value: 'Bitcoin'
@@ -23,7 +42,7 @@ const options = [
 ];
 
 const ConvertCrypto = () => {
-    const [selection, setSelection] = useState(options[0]);
+    const [selection, setSelection] = useState(crypto[0]);
     const [inputData, setInputData] = useState(0);
     const [total, setTotal] = useState(0);
     const [debouncedAmount, setDebouncedAmount] = useState(inputData);
@@ -67,11 +86,17 @@ const ConvertCrypto = () => {
                             updateData={setInputData}
                         />
                         <Dropdown 
-                            label="Select Crypto Coin"
-                            options={options}
+                            label="Convert From"
+                            options={currency}
                             selection={selection}    
                             updateSelection={setSelection}
                         />
+                        <Dropdown 
+                            label="Convert To"
+                            options={crypto}
+                            selection={selection}    
+                            updateSelection={setSelection}
+                        />                        
                          
                         <h4>{`$${debouncedAmount} ${debouncedAmount === '1'  ? 'dollar' : 'dollars'} is worth ${total.toFixed(8)} ${selection.value}`}</h4>
                     </form>
