@@ -48,6 +48,7 @@ const ConvertCrypto = () => {
     const [inputData, setInputData] = useState(0);
     const [total, setTotal] = useState(0);
     const [debouncedAmount, setDebouncedAmount] = useState(inputData);
+    const [swap, setSwap] = useState(false);
        
     useEffect(() => {
         const timeoutId = setTimeout(() => {
@@ -57,7 +58,6 @@ const ConvertCrypto = () => {
         return () => {
             clearTimeout(timeoutId);
         }
-
     }, [inputData]);
 
     useEffect(() => {
@@ -70,14 +70,18 @@ const ConvertCrypto = () => {
                 }
             });
 
-            console.log(data);
-
             setTotal(debouncedAmount / data.rates[cryptoSymbol.id]);
         }
         return convertAPI();    
-    }, [debouncedAmount, currencySymbol, cryptoSymbol]);
- 
-    return (
+    }, [debouncedAmount, currencySymbol.id, cryptoSymbol.id]);
+
+    const onButtonClick = () => {
+        setSwap(true);
+
+    }
+
+    console.log(swap);
+    return (        
         <div className="ui centered grid">
             <div className="six wide column">
                 <div className="ui segment">
@@ -94,7 +98,7 @@ const ConvertCrypto = () => {
                             selection={currencySymbol}    
                             updateSelection={setCurrencySymbol}
                         />
-
+                        <button onClick={() => {onButtonClick()}} className="ui button">Swap</button>
                         <Dropdown 
                             label="Convert To"
                             options={crypto}
@@ -107,6 +111,7 @@ const ConvertCrypto = () => {
             </div>
         </div>
     );
+
 };
 
 export default ConvertCrypto;
