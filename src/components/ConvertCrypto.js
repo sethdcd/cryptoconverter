@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import InputForm from './InputForm';
 import Dropdown from './Dropdown';
+import '../css/ConvertCrypto.css'
 import axios from 'axios';
 
 const currency = [
@@ -42,7 +43,8 @@ const crypto = [
 ];
 
 const ConvertCrypto = () => {
-    const [selection, setSelection] = useState(crypto[0]);
+    const [currencySymbol, setCurrencySymbol] = useState(currency[0]);
+    const [cryptoSymbol, setCryptoSymbol] = useState(crypto[0]);
     const [inputData, setInputData] = useState(0);
     const [total, setTotal] = useState(0);
     const [debouncedAmount, setDebouncedAmount] = useState(inputData);
@@ -50,7 +52,7 @@ const ConvertCrypto = () => {
     useEffect(() => {
         const timeoutId = setTimeout(() => {
             setDebouncedAmount(inputData);
-        }, 500);
+        }, 750);
 
         return () => {
             clearTimeout(timeoutId);
@@ -63,16 +65,17 @@ const ConvertCrypto = () => {
             const {data} = await axios.get('http://api.coinlayer.com/live', {
                 params: {
                     access_key: 'db5f64c6b27b92dea6c84e017f538c66',
-                    symbols: selection.id
+                    target: currencySymbol.id,
+                    symbols: cryptoSymbol.id
                 }
             });
-    
-            setTotal(debouncedAmount / data.rates[selection.id]);
+
+            console.log(data);
+
+            setTotal(debouncedAmount / data.rates[cryptoSymbol.id]);
         }
         return convertAPI();    
-    }, [debouncedAmount, selection]);
-
- 
+    }, [debouncedAmount, currencySymbol, cryptoSymbol]);
  
     return (
         <div className="ui centered grid">
@@ -88,17 +91,17 @@ const ConvertCrypto = () => {
                         <Dropdown 
                             label="Convert From"
                             options={currency}
-                            selection={selection}    
-                            updateSelection={setSelection}
+                            selection={currencySymbol}    
+                            updateSelection={setCurrencySymbol}
                         />
+
                         <Dropdown 
                             label="Convert To"
                             options={crypto}
-                            selection={selection}    
-                            updateSelection={setSelection}
-                        />                        
-                         
-                        <h4>{`$${debouncedAmount} ${debouncedAmount === '1'  ? 'dollar' : 'dollars'} is worth ${total.toFixed(8)} ${selection.value}`}</h4>
+                            selection={cryptoSymbol}    
+                            updateSelection={setCryptoSymbol}
+                        />
+                        <h4 className="converter-output">{`${debouncedAmount} ${currencySymbol.value}${debouncedAmount !== '1' && currencySymbol.id !== 'JPY' ? 's' : ''} is worth ${total.toFixed(8)} ${cryptoSymbol.value}`}</h4>
                     </form>
                 </div>
             </div>
